@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import urllib.parse
 from scrapy_demo.items import ScrapyDemoItem
 from scrapy.loader import ItemLoader
+from scrapy.loader.processors import MapCompose, Join
 
 
 class HomeSpider(scrapy.Spider):
@@ -27,10 +29,12 @@ class HomeSpider(scrapy.Spider):
         # yield item
 
         # 使用item装载器ItemLoader
+        # 使用MapCompose处理器
         ld = ItemLoader(item=ScrapyDemoItem(), response=response)
-        ld.add_xpath('title', '//*[@itemprop="name"][1]/text()')
-        ld.add_xpath('price', '//*[@itemprop="price"][1]/text()', re='[,.0-9]+')
-        ld.add_xpath('description', '//*[@itemprop="description"][1]/text()')
-        ld.add_xpath('address', '//*[@itemtype="http://schema.org/Place"][1]/text()')
-        ld.add_xpath('images', '//*[@itemprop="image"][1]/@src')
+        ld.add_xpath('title', '//*[@itemprop="name"][1]/text()', MapCompose(str.strip, str.title))
+        ld.add_xpath('price', '//*[@itemprop="price"][1]/text()', MapCompose(lambda i: i.replace(',', ''), float), re='[,.0-9]+')
+        ld.add_xpath('description', '//*[@itemprop="description"][1]/text()', MapCompose(str.strip), Join())
+        ld.add_xpath('address', '//*[@itemtype="http://schema.org/Place"][1]/text()', MapCompose(str.strip))
+        ld.add_xpath('images', '//*[@itemprop="image"][1]/@src', MapCompose(lambda i: urllib.parse.urljoin(response.url, i)))
+
         yield ld.load_item()
