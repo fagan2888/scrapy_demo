@@ -4,6 +4,8 @@ import urllib.parse
 from scrapy_demo.items import ScrapyDemoItem
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import MapCompose, Join
+import socket
+import datetime
 
 
 class HomeSpider(scrapy.Spider):
@@ -36,5 +38,12 @@ class HomeSpider(scrapy.Spider):
         ld.add_xpath('description', '//*[@itemprop="description"][1]/text()', MapCompose(str.strip), Join())
         ld.add_xpath('address', '//*[@itemtype="http://schema.org/Place"][1]/text()', MapCompose(str.strip))
         ld.add_xpath('images', '//*[@itemprop="image"][1]/@src', MapCompose(lambda i: urllib.parse.urljoin(response.url, i)))
+
+        # 使用add_value添加单个值
+        ld.add_value('url', response.url)
+        ld.add_value('project', self.settings.get('BOT_NAME'))
+        ld.add_value('spider', self.name)
+        ld.add_value('server', socket.gethostname())
+        ld.add_value('date', datetime.datetime.now())
 
         yield ld.load_item()
