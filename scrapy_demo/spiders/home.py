@@ -14,6 +14,14 @@ class HomeSpider(scrapy.Spider):
     start_urls = ['http://172.28.128.1:9312/properties/index_00000.html']
 
     def parse(self, response):
+        """ This function parse a property page.
+
+        @url http://172.28.128.1:9312/properties/index_00000.html
+        @returns items 1
+        @scrapes title price description address images
+        @scrapes url project spider server date        
+        """
+
         # self.log('title: %s' % response.xpath('//*[@itemprop="name"][1]/text()').extract())
         # self.log('price: %s' % response.xpath('//*[@itemprop="price"][1]/text()').re('[.0-9]+'))
         # self.log('description: %s' % response.xpath('//*[@itemprop="description"][1]/text()').extract())
