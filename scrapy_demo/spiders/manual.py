@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import urllib.parse
 from scrapy_demo.items import ScrapyDemoItem
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import MapCompose, Join
+import urllib.parse
 import socket
 import datetime
 import re
@@ -28,7 +28,6 @@ class ManualSpider(scrapy.Spider):
         # 获取列表项目
         item_selector = response.xpath('//*[@itemprop="url"]/@href')
         for url in item_selector.extract():
-            print("item url:\n", url)
             yield scrapy.Request(urllib.parse.urljoin(response.url, url), callback=self.parse_item)
 
     def parse_item(self, response):
